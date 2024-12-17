@@ -1,7 +1,19 @@
 package com.jsandis.robot.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Direction {
-    NORTH, EAST, SOUTH, WEST;
+    NORTH("N"),
+    EAST("E"),
+    SOUTH("S"),
+    WEST("W");
+
+    private final String shortName;
+
+    Direction(String shortName) {
+        this.shortName = shortName;
+    }
 
     public Direction left() {
         return switch (this) {
@@ -20,5 +32,9 @@ public enum Direction {
             case WEST -> NORTH;
         };
     }
-}
 
+    @Override
+    public String toString() {
+        return shortName;
+    }
+}

@@ -20,11 +20,21 @@ public class RobotService {
         System.out.println("Robot: " + robot);
         System.out.println("Commands: " + commands);
 
-        //Loop through commands and handle each case
-        //Don't forget error handling including out of bounds
+        for(char command : commands.toCharArray()) {
+            switch (command) {
+                case 'L' -> robot.turnLeft();
+                case 'R' -> robot.turnRight();
+                case 'F' -> moveRobotForwardWithBoundsHandling();
+                default -> throw new IllegalArgumentException("Command is invalid: " + command);
+            }
+        }
+        return "Report: " + robot.getPosition().x() + " " + robot.getPosition().y() + " " + robot.getDirection().getShortName();
+    }
 
-        //return result
-
-        return null;
+    private void moveRobotForwardWithBoundsHandling() {
+        Position newPosition = robot.moveForward();
+        if (!room.isWithinBounds(newPosition)) {
+            throw new IllegalStateException("Robot can't move outside of room bounds at position: " + newPosition.x() + " " + newPosition.y());
+        }
     }
 }
