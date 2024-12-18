@@ -1,12 +1,10 @@
 package com.jsandis.robot.model;
 
 import com.jsandis.robot.model.enums.Direction;
-import lombok.Getter;
 
-@Getter
 public class Robot {
 
-    private final Position position;
+    private Position position;
     private Direction direction;
 
     public Robot(Position position, Direction direction) {
@@ -14,20 +12,40 @@ public class Robot {
         this.direction = direction;
     }
 
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
     public void turnLeft() {
-        direction = direction.left();
+        this.direction = direction.left();
     }
 
     public void turnRight() {
-        direction = direction.right();
+        this.direction = direction.right();
     }
 
-    public Position moveForward() {
-        return switch (direction) {
-            case NORTH -> new Position(position.x(), position.y() + 1);
-            case EAST -> new Position(position.x() + 1, position.y());
-            case SOUTH -> new Position(position.x(), position.y() - 1);
-            case WEST -> new Position(position.x() - 1, position.y());
-        };
+    public void moveForward() {
+        int newX = this.position.x();
+        int newY = this.position.y();
+
+        switch (this.direction) {
+            case N -> newY -= 1;
+            case E -> newX += 1;
+            case S -> newY += 1;
+            case W -> newX -= 1;
+        }
+        this.position = new Position(newX, newY);
     }
 }

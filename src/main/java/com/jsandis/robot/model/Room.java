@@ -2,16 +2,16 @@ package com.jsandis.robot.model;
 
 public class Room {
     private final int width;
-    private final int height;
+    private final int depth;
 
-    public Room(int width, int height) {
+    public Room(int width, int depth) {
         this.width = width;
-        this.height = height;
+        this.depth = depth;
     }
 
-    public boolean isWithinBounds(Position position) {
-        return position.x() >= 0 && position.x() < width &&
-                position.y() >= 0 && position.y() < height;
+    public boolean isOutsideBounds(Position position) {
+        return position.x() < 0 || position.x() >= this.width ||
+                position.y() < 0 || position.y() >= this.depth;
     }
 }
 
