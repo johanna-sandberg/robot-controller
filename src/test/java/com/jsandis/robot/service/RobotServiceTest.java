@@ -17,17 +17,6 @@ class RobotServiceTest {
     }
 
     @Test
-    void testInitializeValidRoomAndRobot() {
-        int roomWidth = 5;
-        int roomDepth = 5;
-        Position startPosition = new Position(1, 2);
-        Direction north = Direction.N;
-        robotService.initialize(roomWidth, roomDepth, startPosition, north);
-
-        assertTrue(true);
-    }
-
-    @Test
     void testInitializeWithStartPositionOutOfBounds() {
         int roomWidth = 5;
         int roomDepth = 5;
@@ -41,6 +30,20 @@ class RobotServiceTest {
     }
 
     @Test
+    void testInitializeWithOutOfBoundsPositionInLargeRoom() {
+        int roomWidth = 1000;
+        int roomDepth = 1000;
+        Position startPosition = new Position(1001, 500);
+        Direction startDirection = Direction.N;
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> robotService.initialize(roomWidth, roomDepth, startPosition, startDirection)
+        );
+        assertEquals("Start position is outside room bounds: " + startPosition, exception.getMessage());
+    }
+
+    @Test
     void testProcessCommandsInvalidCommand() {
         int roomWidth = 5;
         int roomDepth = 5;
@@ -48,9 +51,11 @@ class RobotServiceTest {
         Direction north = Direction.N;
         robotService.initialize(roomWidth, roomDepth, startPosition, north);
 
-        String result = robotService.processCommands("LFX");
-
-        assertTrue(result.contains("Error: Command is invalid: X"));
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> robotService.processCommands("LFX")
+        );
+        assertTrue(exception.getMessage().contains("Commands can only contain 'L', 'R', or 'F'. Commands entered: LFX"));
     }
 
     @Test
@@ -61,9 +66,11 @@ class RobotServiceTest {
         Direction north = Direction.N;
         robotService.initialize(roomWidth, roomDepth, startPosition, north);
 
-        String result = robotService.processCommands("F");
-
-        assertTrue(result.contains("Error: Robot can't move outside of room bounds to position: 0 -1"));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> robotService.processCommands("F")
+        );
+        assertTrue(exception.getMessage().contains("Robot can't move outside of room bounds. Current position: Position[x=0, y=-1], Room dimensions: 5x5"));
     }
 
     @Test
@@ -90,5 +97,35 @@ class RobotServiceTest {
         String result = robotService.processCommands("RFLFFLRF");
 
         assertEquals("Report: 3 1 E", result);
+    }
+
+    @Test
+    void testRobotMoveInLargeRoom() {
+        int roomWidth = 1000;
+        int roomDepth = 1000;
+        Position startPosition = new Position(500, 500);
+        Direction startDirection = Direction.N;
+
+        robotService.initialize(roomWidth, roomDepth, startPosition, startDirection);
+
+        String result = robotService.processCommands("F");
+
+        assertEquals("Report: 500 499 N", result);
+    }
+
+    @Test
+    void testRobotMoveOutOfBoundsInLargeRoom() {
+        int roomWidth = 1000;
+        int roomDepth = 1000;
+        Position startPosition = new Position(0, 0);
+        Direction startDirection = Direction.N;
+
+        robotService.initialize(roomWidth, roomDepth, startPosition, startDirection);
+
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> robotService.processCommands("F")
+        );
+        assertTrue(exception.getMessage().contains("Robot can't move outside of room bounds"));
     }
 }

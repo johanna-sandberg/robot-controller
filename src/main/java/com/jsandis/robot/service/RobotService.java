@@ -32,15 +32,15 @@ public class RobotService {
     }
 
     public String processCommands(String commands) {
+        if (commands.isEmpty() || !commands.matches("[LRF]*")) {
+            throw new IllegalArgumentException("Commands can only contain 'L', 'R', or 'F'. Commands entered: " + commands);
+        }
+
+
         logger.info("Processing commands: {}", commands);
 
         for (char command : commands.toCharArray()) {
-            try {
-                handleCommand(command);
-            } catch (Exception e) {
-                logger.error("Error processing command {}: {}", command, e.getMessage());
-                return "Error: " + e.getMessage();
-            }
+            handleCommand(command);
         }
         return "Report: " + this.robot.getPosition().x() + " " + this.robot.getPosition().y() + " "
                 + this.robot.getDirection();
@@ -53,7 +53,6 @@ public class RobotService {
             case 'F' -> moveRobotForwardWithBoundsHandling();
             default -> throw new IllegalArgumentException("Command is invalid: " + command);
         }
-        logger.info("New position and direction: {} {}", this.robot.getPosition(), this.robot.getDirection());
     }
 
     private void moveRobotForwardWithBoundsHandling() {
@@ -61,10 +60,10 @@ public class RobotService {
 
         Position newPosition = this.robot.getPosition();
 
-        if (room.isOutsideBounds(newPosition)) {
-            throw new IllegalStateException("Robot can't move outside of room bounds to position: "
-                    + newPosition.x() + " " + newPosition.y());
+        if (this.room.isOutsideBounds(newPosition)) {
+            throw new IllegalStateException("Robot can't move outside of room bounds. Current position: "
+                    + newPosition + ", Room dimensions: " + this.room.width() + "x" + room.depth());
+
         }
     }
-
 }
